@@ -1,0 +1,64 @@
+This kafka cluster is composed of a single zookeeper server and two kafka brokers
+
+Before launching the cluster, we need first to create certifications for both kafka servers and clients.
+
+Open the file .env and edit it with your personnal informations
+Create local DNS in /etc/hosts using the domaine name that you set for brokers in .env file
+
+
+Create certifications
+
+$ sudo ./createAllCerts.sh
+
+Launch the cluster using docker-compose
+
+$ sudo docker-compose up -d
+
+################################################################
+
+# List all contaners details
+
+sudo docker ps -a
+
+# List all containers IDs
+
+sudo docker ps -a -q
+
+# Stop all containers
+
+sudo docker stop $(sudo docker ps -a -q)
+
+# Remove all containers
+
+sudo docker rm $(sudo docker ps -a -q)
+
+
+################################################################
+
+Download kafka source file in your machine for testing the cluster with kafka command line clients 
+
+$ wget http://www-eu.apache.org/dist/kafka/2.0.0/kafka_2.11-2.0.0.tgz
+$ tar -xvf kafka_2.11-2.0.0.tgz
+$ cd kafka_2.11-2.0.0/bin
+
+
+Create Topic
+
+$ ./kafka-topics.sh --zookeeper localhost:2181 --create --topic test --partitions 2 --replication-factor 2
+
+Add Acls for producer
+
+$ ./kafka-acls.sh --authorizer-properties zookeeper.connect=localhost:2181 --add --allow-principal User:"CN=elhaloui,OU=kafka,O=kafka,L=kafka,ST=kafka,C=XX" --producer --topic test
+
+Add Acls for consumer
+
+$ ./kafka-acls.sh --authorizer-properties zookeeper.connect=localhost:2181 --add --allow-principal User:"CN=elhaloui,OU=kafka,O=kafka,L=kafka,ST=kafka,C=XX" --consumer --topic test --group elhalouimed-consumer
+        
+Launch Producer
+
+$ ./kafka-console-producer.sh --broker-list kafka.elhalouimed.broker1:9093, kafka.elhalouimed.broker2:9094 --topic test -producer.config /home/elhaloui/Work/securedKafkaDocker/clients/elhaloui/client-ssl.properties
+
+Launch Consumer
+
+$ ./kafka-console-consumer.sh --bootstrap-server kafka.elhalouimed.broker1:9093,kafka.elhalouimed.broker2:9094 --topic test --consumer.config /home/elhaloui/Work/securedKafkaDocker/clients/elhaloui/client-ssl.properties --group elhalouimed-consumer --from-beginning
+

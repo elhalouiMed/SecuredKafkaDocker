@@ -1,0 +1,55 @@
+version: '2'
+services:
+  zookeeper:
+    image: elhalouimed/zookeeper
+    ports:
+      - ${ZK_PORT}:${ZK_PORT}
+
+  broker1:
+    image: elhalouimed/kafka
+    ports:
+      - ${KAFKA_BROKER1_PORT}:${KAFKA_BROKER1_PORT}
+    hostname: "${KAFKA_BROKER1_HOST}"
+    extra_hosts:
+      - "${KAFKA_BROKER2_HOST} : ${KAFKA_BROKER2_HOST_M}"
+    depends_on:
+      - "zookeeper"
+    links:
+      - "zookeeper"
+    environment:
+       KAFKA_BROKER_ID: 1
+       KAFKA_ADVERTISED_HOST_NAME: "${KAFKA_BROKER1_HOST}"
+       KAFKA_ADVERTISED_PORT: ${KAFKA_BROKER1_PORT}
+       KAFKA_ZOOKEEPER_CONNECT: ${ZK_HOST}:${ZK_PORT}
+       SECURITY_PROTOCOL: "SSL"
+       SSL_KEYSTORE_LOCATION: /configs/certifs/kafka.server.keystore.jks
+       SSL_TRUSTSTORE_LOCATION: /configs/certifs/kafka.server.truststore.jks
+       SSL_PASSWORD: "${SSLPASSPHRASE}"
+       SUPER_USERS:
+          'User:CN=${KAFKA_BROKER1_HOST},OU=kafka,O=kafka,L=kafka,ST=kafka,C=XX;
+           User:CN=${KAFKA_BROKER2_HOST},OU=kafka,O=kafka,L=kafka,ST=kafka,C=XX'
+    volumes:
+      - ${CURRENT_PATH}/kafka/broker1/certifs:/configs/certifs
+  broker2:
+    image: elhalouimed/kafka
+    ports:
+      - ${KAFKA_BROKER2_PORT}:${KAFKA_BROKER2_PORT}
+    hostname: "${KAFKA_BROKER2_HOST}"
+    extra_hosts:
+      - "${KAFKA_BROKER1_HOST} : ${KAFKA_BROKER1_HOST_M}"
+    depends_on:
+      - "broker1"
+    environment:
+       KAFKA_BROKER_ID: 2
+       KAFKA_ADVERTISED_HOST_NAME: "${KAFKA_BROKER2_HOST}"
+       KAFKA_ADVERTISED_PORT: ${KAFKA_BROKER2_PORT}
+       KAFKA_ZOOKEEPER_CONNECT: ${ZK_HOST}:${ZK_PORT}
+       SECURITY_PROTOCOL: "SSL"
+       SSL_KEYSTORE_LOCATION: /configs/certifs/kafka.server.keystore.jks
+       SSL_TRUSTSTORE_LOCATION: /configs/certifs/kafka.server.truststore.jks
+       SSL_PASSWORD: "${SSLPASSPHRASE}"
+       SUPER_USERS:
+          'User:CN=${KAFKA_BROKER1_HOST},OU=kafka,O=kafka,L=kafka,ST=kafka,C=XX;
+           User:CN=${KAFKA_BROKER2_HOST},OU=kafka,O=kafka,L=kafka,ST=kafka,C=XX'
+    volumes:
+      - ${CURRENT_PATH}/kafka/broker2/certifs:/configs/certifs
