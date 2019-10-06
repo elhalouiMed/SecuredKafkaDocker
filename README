@@ -37,9 +37,9 @@ sudo docker rm $(sudo docker ps -a -q)
 
 Download kafka source file in your machine for testing the cluster with kafka command line clients 
 
-$ wget http://www-eu.apache.org/dist/kafka/2.0.0/kafka_2.11-2.0.0.tgz
-$ tar -xvf kafka_2.11-2.0.0.tgz
-$ cd kafka_2.11-2.0.0/bin
+$ wget https://www-eu.apache.org/dist/kafka/2.3.0/kafka_2.12-2.3.0.tgz 
+$ tar -xvf kafka_2.12-2.3.0.tgz
+$ cd kafka_2.12-2.3.0/bin
 
 
 Create Topic
