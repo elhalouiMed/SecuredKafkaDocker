@@ -1,3 +1,5 @@
+# Kafka Cluster
+
 This kafka cluster is composed of a single zookeeper server and two kafka brokers
 
 Before launching the cluster, we need first to create certifications for both kafka servers and clients.
@@ -34,6 +36,9 @@ sudo docker rm $(sudo docker ps -a -q)
 
 
 ################################################################
+# Getting started
+
+update .env file
 
 Download kafka source file in your machine for testing the cluster with kafka command line clients 
 
